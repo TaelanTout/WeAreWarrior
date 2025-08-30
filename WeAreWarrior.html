@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Template Bannières Aléatoires</title>
+  <title>WE ARE WARRIOR</title>
   <style>
     body {
       margin: 0;
@@ -27,19 +27,21 @@
     }
     .banner {
       position: absolute;
-      left: 50%; top: 50%;
       transform: translate(-50%, -50%);
-      max-width: 300px;
-      max-height: 200px;
       border-radius: 20px;
       overflow: hidden;
       box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+      cursor: grab;
+    }
+    .banner:active {
+      cursor: grabbing;
     }
     .banner img, .banner video {
       display: block;
       width: 100%;
       height: 100%;
-      object-fit: contain; /* pas de crop */
+      object-fit: contain;
+      border-radius: 20px;
     }
   </style>
 </head>
@@ -54,7 +56,7 @@
       { type: "img", src: "3.jpg" },
       { type: "img", src: "4.jpg" },
       { type: "img", src: "5.jpg" },
-      { type: "video", src: "1.mov" } // une vidéo
+      { type: "video", src: "1.mov" }
     ];
 
     const stage = document.getElementById('stage');
@@ -68,23 +70,61 @@
       medias.forEach((media, i) => {
         const wrapper = document.createElement('div');
         wrapper.className = 'banner';
-        wrapper.style.left = rand(10, 90) + '%';
-        wrapper.style.top  = rand(10, 90) + '%';
-        wrapper.style.transform += ` rotate(${rand(-15, 15)}deg)`;
 
+        // Créer l’élément image ou vidéo
+        let el;
         if (media.type === "img") {
-          const el = document.createElement("img");
+          el = document.createElement("img");
           el.src = media.src;
-          wrapper.appendChild(el);
+          el.onload = () => {
+            const ratio = el.naturalWidth / el.naturalHeight;
+            wrapper.style.width = "250px";
+            wrapper.style.height = (250 / ratio) + "px";
+          };
         } else if (media.type === "video") {
-          const el = document.createElement("video");
+          el = document.createElement("video");
           el.src = media.src;
           el.autoplay = true;
           el.loop = true;
           el.muted = true;
           el.playsInline = true;
-          wrapper.appendChild(el);
+          el.onloadedmetadata = () => {
+            const ratio = el.videoWidth / el.videoHeight;
+            wrapper.style.width = "300px";
+            wrapper.style.height = (300 / ratio) + "px";
+          };
         }
+
+        wrapper.appendChild(el);
+
+        // Position aléatoire
+        wrapper.style.left = rand(20, 80) + '%';
+        wrapper.style.top  = rand(20, 80) + '%';
+        wrapper.style.transform += ` rotate(${rand(-10, 10)}deg)`;
+
+        // Activer le drag & drop
+        let isDragging = false;
+        let offsetX = 0, offsetY = 0;
+
+        wrapper.addEventListener('mousedown', (e) => {
+          isDragging = true;
+          offsetX = e.offsetX;
+          offsetY = e.offsetY;
+        });
+
+        document.addEventListener('mousemove', (e) => {
+          if (!isDragging) return;
+          const rect = stage.getBoundingClientRect();
+          const x = ((e.clientX - rect.left - offsetX) / rect.width) * 100;
+          const y = ((e.clientY - rect.top - offsetY) / rect.height) * 100;
+          wrapper.style.left = Math.max(0, Math.min(100, x)) + '%';
+          wrapper.style.top  = Math.max(0, Math.min(100, y)) + '%';
+        });
+
+        document.addEventListener('mouseup', () => {
+          isDragging = false;
+        });
+
         stage.appendChild(wrapper);
       });
     }
