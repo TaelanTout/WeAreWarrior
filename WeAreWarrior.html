@@ -1,1 +1,214 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Template Bannières Aléatoires</title>
+  <style>
+    :root {
+      --bg: #0e0f13;
+      --fg: #e9eef5;
+      --muted: #9aa4b2;
+      --accent: #7cd1ff;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      background: radial-gradient(1200px 600px at 20% -10%, #1b2433 0%, transparent 70%),
+                  radial-gradient(900px 500px at 110% 10%, #101522 0%, transparent 70%),
+                  linear-gradient(180deg, #0a0c12 0%, #0e0f13 100%);
+      color: var(--fg);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, "Comic Sans MS", "Comic Sans", sans-serif;
+      line-height: 1.5;
+    }
 
+    header {
+      padding: clamp(16px, 3vw, 32px);
+      text-align: center;
+    }
+    h1 {
+      margin: 0.25rem auto 0.5rem;
+      font-family: "Comic Sans MS", "Comic Sans", cursive;
+      font-size: clamp(2.5rem, 6vw + 1rem, 7rem);
+      letter-spacing: 0.5px;
+      color: #fff;
+      text-shadow: 0 2px 0 rgba(0,0,0,.4), 0 10px 30px rgba(0,0,0,.5);
+    }
+    p.tagline {
+      margin: 0 auto;
+      max-width: 900px;
+      color: var(--muted);
+      font-size: clamp(0.95rem, 1.2vw + 0.6rem, 1.25rem);
+    }
+
+    .controls {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      align-items: center;
+      padding: 12px clamp(12px, 3vw, 24px) 0;
+    }
+    button {
+      border: none;
+      padding: 10px 16px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, var(--accent), #5fbef2);
+      color: #0a0c12;
+      font-weight: 700;
+      box-shadow: 0 10px 25px rgba(124, 209, 255, .25);
+      cursor: pointer;
+      transition: transform .08s ease, filter .2s ease;
+    }
+    button:active { transform: translateY(1px) scale(0.99); }
+    button:hover { filter: brightness(1.03); }
+
+    main { padding: clamp(8px, 2vw, 16px); }
+    #stage {
+      position: relative;
+      height: min(80vh, 900px);
+      min-height: 480px;
+      border-radius: 24px;
+      overflow: hidden;
+      background: repeating-linear-gradient(45deg, rgba(255,255,255,.03) 0 20px, rgba(255,255,255,.015) 20px 40px),
+                  radial-gradient(1200px 500px at 50% 0, rgba(255,255,255,.05), transparent 65%);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.05), 0 25px 80px rgba(0,0,0,.55);
+    }
+
+    .banner {
+      position: absolute;
+      left: 50%; top: 50%;
+      width: clamp(180px, 28vw, 420px);
+      aspect-ratio: 16 / 9;
+      background-size: cover;
+      background-position: center;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.45), 0 2px 0 rgba(0,0,0,.4) inset;
+      user-select: none;
+      touch-action: none;
+      transition: box-shadow .2s ease;
+    }
+    .banner:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+    .banner:hover { box-shadow: 0 14px 36px rgba(0,0,0,.55), 0 2px 0 rgba(0,0,0,.4) inset; }
+
+    footer {
+      text-align: center;
+      color: var(--muted);
+      padding: 18px;
+      font-size: .95rem;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * { transition: none !important; animation: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>TON GROS TITRE</h1>
+    <p class="tagline">Remplace ce texte par un sous‑titre. Les bannières ci‑dessous se placent aléatoirement à chaque chargement ou clic sur « Remélanger ».</p>
+    <div class="controls">
+      <button id="shuffle" type="button" title="Repositionner aléatoirement">Remélanger</button>
+    </div>
+  </header>
+
+  <main>
+    <div id="stage" aria-label="Zone de bannières aléatoires"></div>
+  </main>
+
+  <footer>
+    Template HTML pur — aucune dépendance. Glisse‑dépose les bannières pour les placer manuellement.
+  </footer>
+
+  <script>
+    // 1) Renseigne tes URL d'images ici (locales ou absolues)
+    const images = [
+      "images/banner1.jpg",
+      "images/banner2.jpg",
+      "images/banner3.jpg",
+      "images/banner4.jpg",
+      "images/banner5.jpg"
+    ];
+
+    // 2) Options rapides
+    const OPTIONS = {
+      rotationMin: -18,  // degrés
+      rotationMax:  18,
+      scaleMin: 0.92,
+      scaleMax: 1.08,
+      marginPercent: 8,  // évite les bords
+    };
+
+    const stage = document.getElementById('stage');
+    const shuffleBtn = document.getElementById('shuffle');
+
+    // Utilitaire nombre aléatoire float dans [min, max]
+    const rand = (min, max) => Math.random() * (max - min) + min;
+
+    function placeBanners() {
+      stage.innerHTML = '';
+      const { marginPercent, rotationMin, rotationMax, scaleMin, scaleMax } = OPTIONS;
+
+      images.forEach((src, i) => {
+        const el = document.createElement('div');
+        el.className = 'banner';
+        el.setAttribute('role', 'img');
+        el.setAttribute('aria-label', `Bannière ${i+1}`);
+        el.style.backgroundImage = `url('${src}')`;
+
+        // Position en % avec marges internes
+        const left = rand(marginPercent, 100 - marginPercent);
+        const top  = rand(marginPercent, 100 - marginPercent);
+        el.style.left = left + '%';
+        el.style.top  = top  + '%';
+
+        // Rotation/échelle arbitraire
+        const rot = rand(rotationMin, rotationMax).toFixed(2);
+        const scl = rand(scaleMin, scaleMax).toFixed(3);
+        el.style.transform = `translate(-50%, -50%) rotate(${rot}deg) scale(${scl})`;
+        el.style.zIndex = 100 + i; // empilement simple
+
+        stage.appendChild(el);
+      });
+    }
+
+    // Drag & drop (pointer events) pour repositionner manuellement
+    let dragging = null, pid = null, offset = { x: 0, y: 0 };
+
+    stage.addEventListener('pointerdown', (e) => {
+      const t = e.target;
+      if (!t.classList.contains('banner')) return;
+      dragging = t; pid = e.pointerId; dragging.setPointerCapture(pid);
+      const rect = dragging.getBoundingClientRect();
+      offset.x = e.clientX - rect.left; // position du clic dans l'élément
+      offset.y = e.clientY - rect.top;
+    });
+
+    stage.addEventListener('pointermove', (e) => {
+      if (!dragging) return;
+      const rect = stage.getBoundingClientRect();
+      const x = (e.clientX - rect.left - offset.x + dragging.clientWidth / 2) / stage.clientWidth * 100;
+      const y = (e.clientY - rect.top  - offset.y + dragging.clientHeight/ 2) / stage.clientHeight * 100;
+      // garde dans la zone avec une marge
+      const m = OPTIONS.marginPercent;
+      const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+      dragging.style.left = clamp(x, m, 100 - m) + '%';
+      dragging.style.top  = clamp(y, m, 100 - m) + '%';
+    });
+
+    const endDrag = () => { if (dragging && pid != null) { dragging.releasePointerCapture(pid); } dragging = null; pid = null; };
+    stage.addEventListener('pointerup', endDrag);
+    stage.addEventListener('pointercancel', endDrag);
+    stage.addEventListener('lostpointercapture', endDrag);
+
+    // Remélanger
+    shuffleBtn.addEventListener('click', placeBanners);
+
+    // Recalcul simple au redimensionnement
+    window.addEventListener('resize', placeBanners);
+
+    // Premier rendu
+    window.addEventListener('load', placeBanners);
+  </script>
+</body>
+</html>
