@@ -1,135 +1,273 @@
-<!doctype html>
-<html lang="fr">
+```html
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>WE ARE WARRIOR</title>
-  <style>
-    body {
-      margin: 0;
-      background: #111;
-      color: #fff;
-      font-family: "Comic Sans MS", "Comic Sans", cursive;
-      text-align: center;
-    }
-    h1 {
-      font-size: 4rem;
-      margin: 1rem 0;
-    }
-    #stage {
-      position: relative;
-      height: 80vh;
-      border: 2px solid #444;
-      border-radius: 20px;
-      margin: 1rem;
-      overflow: hidden;
-      background: #222;
-    }
-    .banner {
-      position: absolute;
-      transform: translate(-50%, -50%);
-      border-radius: 20px;
-      overflow: hidden;
-      box-shadow: 0 10px 20px rgba(0,0,0,0.5);
-      cursor: grab;
-    }
-    .banner:active {
-      cursor: grabbing;
-    }
-    .banner img, .banner video {
-      display: block;
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      border-radius: 20px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WE ARE WARRIOR</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+            color: white;
+        }
+        
+        h1 {
+            text-align: center;
+            font-size: 48px;
+            color: white;
+            margin-bottom: 30px;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+        
+        .media-container {
+            position: relative;
+            width: 100%;
+            height: calc(100vh - 120px);
+        }
+        
+        .draggable {
+            position: absolute;
+            cursor: move;
+            border: 2px solid transparent;
+            transition: border-color 0.3s, transform 0.2s;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .draggable:hover {
+            border-color: rgba(255, 255, 255, 0.5);
+            transform: scale(1.02);
+        }
+        
+        .draggable.dragging {
+            opacity: 0.8;
+            z-index: 1000;
+            border-color: white;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+        }
+        
+        .photo {
+            width: 200px;
+            height: 150px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+            text-align: center;
+            padding: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .video {
+            width: 300px;
+            height: 200px;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+            text-align: center;
+            padding: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: cover;
+            border-radius: 6px;
+        }
+        
+        video {
+            max-width: 100%;
+            max-height: 100%;
+            border-radius: 6px;
+        }
+        
+        .placeholder {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            color: white;
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 36px;
+            }
+            
+            .photo {
+                width: 150px;
+                height: 112px;
+            }
+            
+            .video {
+                width: 225px;
+                height: 150px;
+            }
+        }
+    </style>
 </head>
 <body>
-  <h1>WE ARE WARRIOR</h1>
-
-  <div id="stage"></div>
-
-  <script>
-    const medias = [
-      { type: "img", src: "2.jpg" },
-      { type: "img", src: "3.jpg" },
-      { type: "img", src: "4.jpg" },
-      { type: "img", src: "5.jpg" },
-      { type: "video", src: "1.mov" }
-    ];
-
-    const stage = document.getElementById('stage');
-
-    function rand(min, max) {
-      return Math.random() * (max - min) + min;
-    }
-
-    function placeBanners() {
-      stage.innerHTML = '';
-      medias.forEach((media, i) => {
-        const wrapper = document.createElement('div');
-        wrapper.className = 'banner';
-
-        // Créer l’élément image ou vidéo
-        let el;
-        if (media.type === "img") {
-          el = document.createElement("img");
-          el.src = media.src;
-          el.onload = () => {
-            const ratio = el.naturalWidth / el.naturalHeight;
-            wrapper.style.width = "250px";
-            wrapper.style.height = (250 / ratio) + "px";
-          };
-        } else if (media.type === "video") {
-          el = document.createElement("video");
-          el.src = media.src;
-          el.autoplay = true;
-          el.loop = true;
-          el.muted = true;
-          el.playsInline = true;
-          el.onloadedmetadata = () => {
-            const ratio = el.videoWidth / el.videoHeight;
-            wrapper.style.width = "300px";
-            wrapper.style.height = (300 / ratio) + "px";
-          };
-        }
-
-        wrapper.appendChild(el);
-
-        // Position aléatoire
-        wrapper.style.left = rand(20, 80) + '%';
-        wrapper.style.top  = rand(20, 80) + '%';
-        wrapper.style.transform += ` rotate(${rand(-10, 10)}deg)`;
-
-        // Activer le drag & drop
-        let isDragging = false;
-        let offsetX = 0, offsetY = 0;
-
-        wrapper.addEventListener('mousedown', (e) => {
-          isDragging = true;
-          offsetX = e.offsetX;
-          offsetY = e.offsetY;
+    <h1>WE ARE WARRIOR</h1>
+    
+    <div class="media-container">
+        <!-- Photo 1 -->
+        <div class="draggable photo" style="left: 50px; top: 50px;">
+            <img src="" alt="Photo 1" data-filename="6.jpg">
+            <div class="placeholder-text">Photo 1 - Replace with your image</div>
+        </div>
+        
+        <!-- Photo 2 -->
+        <div class="draggable photo" style="left: 300px; top: 50px;">
+            <img src="" alt="Photo 2" data-filename="2.jpg">
+            <div class="placeholder-text">Photo 2 - Replace with your image</div>
+        </div>
+        
+        <!-- Photo 3 -->
+        <div class="draggable photo" style="left: 550px; top: 50px;">
+            <img src="" alt="Photo 3" data-filename="3.jpg">
+            <div class="placeholder-text">Photo 3 - Replace with your image</div>
+        </div>
+        
+        <!-- Photo 4 -->
+        <div class="draggable photo" style="left: 50px; top: 250px;">
+            <img src="" alt="Photo 4" data-filename="4.jpg">
+            <div class="placeholder-text">Photo 4 - Replace with your image</div>
+        </div>
+        
+        <!-- Photo 5 -->
+        <div class="draggable photo" style="left: 300px; top: 250px;">
+            <img src="" alt="Photo 5" data-filename="5.jpg">
+            <div class="placeholder-text">Photo 5 - Replace with your image</div>
+        </div>
+        
+        <!-- Video -->
+        <div class="draggable video" style="left: 550px; top: 250px;">
+            <video controls>
+                <source src="" type="video/mp4" data-filename="1.mov">
+                Your browser does not support the video tag.
+            </video>
+            <div class="placeholder-text">Video - Replace with your .mov file</div>
+        </div>
+    </div>
+    
+    <script>
+        // Make elements draggable
+        const draggables = document.querySelectorAll('.draggable');
+        
+        draggables.forEach(draggable => {
+            let isDragging = false;
+            let currentX;
+            let currentY;
+            let initialX;
+            let initialY;
+            let xOffset = 0;
+            let yOffset = 0;
+            
+            // Mouse events
+            draggable.addEventListener('mousedown', dragStart);
+            document.addEventListener('mousemove', drag);
+            document.addEventListener('mouseup', dragEnd);
+            
+            // Touch events
+            draggable.addEventListener('touchstart', dragStart);
+            document.addEventListener('touchmove', drag);
+            document.addEventListener('touchend', dragEnd);
+            
+            function dragStart(e) {
+                if (e.type === "touchstart") {
+                    initialX = e.touches[0].clientX - xOffset;
+                    initialY = e.touches[0].clientY - yOffset;
+                } else {
+                    initialX = e.clientX - xOffset;
+                    initialY = e.clientY - yOffset;
+                }
+                
+                if (e.target.closest('.draggable') === draggable) {
+                    isDragging = true;
+                    draggable.classList.add('dragging');
+                }
+            }
+            
+            function drag(e) {
+                if (isDragging) {
+                    e.preventDefault();
+                    
+                    if (e.type === "touchmove") {
+                        currentX = e.touches[0].clientX - initialX;
+                        currentY = e.touches[0].clientY - initialY;
+                    } else {
+                        currentX = e.clientX - initialX;
+                        currentY = e.clientY - initialY;
+                    }
+                    
+                    xOffset = currentX;
+                    yOffset = currentY;
+                    
+                    setTranslate(currentX, currentY, draggable);
+                }
+            }
+            
+            function setTranslate(xPos, yPos, el) {
+                el.style.transform = `translate(${xPos}px, ${yPos}px)`;
+            }
+            
+            function dragEnd(e) {
+                initialX = currentX;
+                initialY = currentY;
+                
+                isDragging = false;
+                draggable.classList.remove('dragging');
+            }
         });
-
-        document.addEventListener('mousemove', (e) => {
-          if (!isDragging) return;
-          const rect = stage.getBoundingClientRect();
-          const x = ((e.clientX - rect.left - offsetX) / rect.width) * 100;
-          const y = ((e.clientY - rect.top - offsetY) / rect.height) * 100;
-          wrapper.style.left = Math.max(0, Math.min(100, x)) + '%';
-          wrapper.style.top  = Math.max(0, Math.min(100, y)) + '%';
+        
+        // Easy file replacement - double click to change
+        draggables.forEach(draggable => {
+            draggable.addEventListener('dblclick', function() {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = this.classList.contains('video') ? 'video/*' : 'image/*';
+                
+                input.onchange = function(e) {
+                    const file = e.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            if (draggable.classList.contains('video')) {
+                                const video = draggable.querySelector('video');
+                                const source = video.querySelector('source');
+                                source.src = e.target.result;
+                                video.load();
+                                video.style.display = 'block';
+                                draggable.querySelector('.placeholder-text').style.display = 'none';
+                            } else {
+                                const img = draggable.querySelector('img');
+                                img.src = e.target.result;
+                                img.style.display = 'block';
+                                draggable.querySelector('.placeholder-text').style.display = 'none';
+                            }
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                };
+                
+                input.click();
+            });
         });
-
-        document.addEventListener('mouseup', () => {
-          isDragging = false;
-        });
-
-        stage.appendChild(wrapper);
-      });
-    }
-
-    window.addEventListener('load', placeBanners);
-  </script>
+    </script>
 </body>
 </html>
+```
